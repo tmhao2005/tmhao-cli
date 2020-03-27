@@ -23,7 +23,6 @@
     "chalk": "^3.0.0",
     "commander": "^5.0.0",
     "dotenv": "^8.2.0",
-    "qs": "^6.9.3",
     "query-string": "^6.11.1"
   },
   "devDependencies": {
@@ -35,8 +34,6 @@
     "tslint": "^6.1.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
-    "typescript": "^3.8.3",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
+    "typescript": "^3.8.3"
   }
 }

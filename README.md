@@ -23,4 +23,5 @@ sudo chmod 755 /usr/local/bin/tmhao-cli
 
 ```
 tmhao-cli hotfix <yourApp> <yourHotfixBranchName>
+tmhao-cli playJob <yourApp> <yourBranch> [checkOnly]
 ```
