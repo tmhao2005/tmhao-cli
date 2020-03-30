@@ -1,5 +1,5 @@
 import * as qs from "query-string";
-import { createHttp } from "./http";
+import { BaseService } from "./base";
 
 interface SearchProjectInput {
   search: string;
@@ -10,13 +10,14 @@ interface Project {
   name: string;
 }
 
-export const searchProject = async (
-  query: SearchProjectInput
-): Promise<Project[]> => {
-  const http = createHttp();
-  const { data } = await http.get(`/projects?${qs.stringify(query)}`);
+export class ProjectService extends BaseService {
+  constructor() {
+    super();
+  }
 
-  console.log(`/projects?search=${qs.stringify(query)}`);
+  searchProject = async (query: SearchProjectInput): Promise<Project[]> => {
+    const { data } = await this._http.get(`/projects?${qs.stringify(query)}`);
 
-  return data;
-};
+    return data;
+  };
+}

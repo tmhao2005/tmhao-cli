@@ -1,41 +1,38 @@
-import { searchProject } from "../services/project";
+import { ProjectService } from "../services/project";
 import { BranchService } from "../services/branch";
 import { PipelineService } from "../services/pipeline";
 import { JobService } from "../services/job";
-import { warn, info } from "../utils";
+import { log, warn, success } from "../logger";
 
 export async function playJob() {
   const [projectName, branchName, jobName, checkOnly] = arguments;
 
-  const projects = await searchProject({
+  const projectService = new ProjectService();
+  const projects = await projectService.searchProject({
     search: projectName,
   });
 
-  // Need a common validator
   if (!projects.some((item) => item.name === projectName)) {
-    warn("More than one projects found. Check below projects found:");
-    projects.length && warn(projects.map((item) => item.name).join(","));
-    return;
+    return validateResponseItems("project", projects, "name");
   }
 
   const project = projects.shift();
   const branchService = new BranchService(project.id);
 
+  log("scanning input branch...");
   const branches = await branchService.search({
     search: `${branchName}`,
   });
 
   if (!branches.some((item) => item.name === branchName)) {
-    warn(`more than one branches or not found. Check below branches found:`);
-    branches.length && warn(branches.map((item) => item.name).join(","));
-    return;
+    return validateResponseItems("branch", branches, "name");
   }
 
+  success("Found branch: %s", branchName);
   const branch = branches.find((item) => item.name === branchName);
   const pipelineService = new PipelineService();
 
-  // latest pipeline of input branch
-  // 2x
+  log("scanning pipeline of the branch...");
   let pipelines = await pipelineService.searchPipeline({
     id: project.id,
     ref: branch.name,
@@ -53,6 +50,10 @@ export async function playJob() {
   }
 
   let pipeline = pipelines.find((item) => item.status === "success");
+
+  success("Found pipeline: %s", pipeline.id);
+  log("scanning tag %s...", pipeline.id);
+
   pipelines = await pipelineService.searchPipeline({
     id: project.id,
     ref: pipeline.id.toString(), // cause we're setting up "PIPELINE_ID => TAG_NAME"
@@ -63,15 +64,8 @@ export async function playJob() {
     return;
   }
 
-  // Make sure this is manual pipeline
-  // if (!pipelines.some(item => item.status === 'manual')) {
-  //   warn('No manual TAG created');
-  //   return;
-  // }
-
-  // pipeline = pipelines.find(item => item.status === 'manual');
   pipeline = pipelines.shift();
-
+  success("Found pipeline: %s", pipeline.id);
   const jobService = new JobService(project.id);
 
   const jobs = await jobService.getPipelineJobs({
@@ -79,27 +73,50 @@ export async function playJob() {
   });
 
   if (!jobs.some((item) => item.name === jobName)) {
-    warn("Your job name is wrong. Here is what we found:");
-    warn(jobs.map((item) => item.name).join(", "));
+    warn(
+      `Your job name is wrong. ${
+        jobs.length
+          ? `We found ${jobs.map((item) => item.name).join(", ")}`
+          : "We found nothing"
+      }`
+    );
     return;
   }
 
   const job = jobs.find((item) => item.name === jobName);
 
   if (job.status === "running") {
-    warn("This job has been running already. Watch here:");
-    warn(job.web_url);
+    warn(
+      "This job has been running already. Here is the link: %s",
+      job.web_url
+    );
     return;
   }
 
   if (checkOnly) {
-    info("Here is the latest job:");
-    info(job.web_url);
+    success("Nothing is triggered. Here is the latest job: %s", job.web_url);
     return;
   }
 
   const result = await jobService.playJob(job.id);
 
-  info(`Congrats! You triggered successfully. Here is the job URL:`);
-  info(result.web_url);
+  success(
+    `You triggered the job "${jobName}" in pipeline "${pipeline.id}". Here is the job URL: ${result.web_url}`
+  );
+}
+
+function validateResponseItems<T, K extends keyof T>(
+  input: string,
+  items: T[],
+  property: K
+): void {
+  warn(
+    `Your "${input}" is wrong. ${
+      items.length
+        ? `We found similar: [${items
+            .map((item) => item[property])
+            .join(", ")}]`
+        : "We found nothing"
+    }`
+  );
 }

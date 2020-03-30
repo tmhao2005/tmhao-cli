@@ -21,8 +21,14 @@ program
   .action(hotfix);
 
 program
-  .command("playJob <projectName> <branchName> <jobName> [checkOnly]")
-  .description("will play specific job on the latest pipeline")
+  .command("playJob <projectName> <branchName> <jobName>")
+  .description(
+    "will play specific job on the latest pipeline. Required arguments: <projectName> <branchName> <jobName>"
+  )
+  .option(
+    "--view",
+    "If you specify this value, it will just return the latest job only and wont trigger any job"
+  )
   .action(playJob);
 
 program.parse(process.argv);

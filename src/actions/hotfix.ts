@@ -1,12 +1,13 @@
 import * as chalk from "chalk";
-import { searchProject } from "../services/project";
+import { ProjectService } from "../services/project";
 import { searchDevelopment } from "../services/development";
 import { BranchService } from "../services/branch";
 
 export async function hotfix() {
   const [projectName, branchName] = arguments;
 
-  const projects = await searchProject({
+  const projectService = new ProjectService();
+  const projects = await projectService.searchProject({
     search: projectName,
   });
 
