@@ -22,6 +22,6 @@ sudo chmod 755 /usr/local/bin/tmhao-cli
 ### Hotfix
 
 ```
-tmhao-cli hotfix <yourApp> <yourHotfixBranchName>
-tmhao-cli playJob <yourApp> <yourBranch> [checkOnly]
+tmhao-cli hotfix <yourApp> <yourHotfixBranchName> [--manualBranchCreation]
+tmhao-cli playJob <yourApp> <yourBranch> <yourJobName> [--viewJobOnly]
 ```

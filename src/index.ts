@@ -14,19 +14,27 @@ if (parsed.error) {
   throw new Error("You missed to create the required `.env` file");
 }
 
+const version = "1.0.0";
+
 program
-  .version("1.0.0")
+  .version(version)
   .command("hotfix <projectName> <branchName>")
   .description("create a hotfix for specific app")
+  .option(
+    "--manualBranchCreation",
+    "it wont create a branch automatically. But you will create your self by runing the script returned",
+    true
+  )
   .action(hotfix);
 
 program
+  .version(version)
   .command("playJob <projectName> <branchName> <jobName>")
   .description(
     "will play specific job on the latest pipeline. Required arguments: <projectName> <branchName> <jobName>"
   )
   .option(
-    "--view",
+    "--viewJobOnly",
     "If you specify this value, it will just return the latest job only and wont trigger any job"
   )
   .action(playJob);

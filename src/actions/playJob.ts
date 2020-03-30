@@ -3,17 +3,19 @@ import { BranchService } from "../services/branch";
 import { PipelineService } from "../services/pipeline";
 import { JobService } from "../services/job";
 import { log, warn, success } from "../logger";
+import { warnWrongInput } from "../utils";
 
 export async function playJob() {
-  const [projectName, branchName, jobName, checkOnly] = arguments;
+  const [projectName, branchName, jobName, cmd] = arguments;
+  const viewJobOnly = cmd.viewJobOnly;
 
   const projectService = new ProjectService();
   const projects = await projectService.searchProject({
     search: projectName,
   });
 
-  if (!projects.some((item) => item.name === projectName)) {
-    return validateResponseItems("project", projects, "name");
+  if (warnWrongInput(projectName, projects, "name")) {
+    return;
   }
 
   const project = projects.shift();
@@ -24,8 +26,8 @@ export async function playJob() {
     search: `${branchName}`,
   });
 
-  if (!branches.some((item) => item.name === branchName)) {
-    return validateResponseItems("branch", branches, "name");
+  if (warnWrongInput(branchName, branches, "name")) {
+    return;
   }
 
   success("Found branch: %s", branchName);
@@ -93,7 +95,7 @@ export async function playJob() {
     return;
   }
 
-  if (checkOnly) {
+  if (viewJobOnly) {
     success("Nothing is triggered. Here is the latest job: %s", job.web_url);
     return;
   }
@@ -102,21 +104,5 @@ export async function playJob() {
 
   success(
     `You triggered the job "${jobName}" in pipeline "${pipeline.id}". Here is the job URL: ${result.web_url}`
-  );
-}
-
-function validateResponseItems<T, K extends keyof T>(
-  input: string,
-  items: T[],
-  property: K
-): void {
-  warn(
-    `Your "${input}" is wrong. ${
-      items.length
-        ? `We found similar: [${items
-            .map((item) => item[property])
-            .join(", ")}]`
-        : "We found nothing"
-    }`
   );
 }
