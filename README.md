@@ -21,7 +21,30 @@ sudo chmod 755 /usr/local/bin/tmhao-cli
 ## CLI
 ### Hotfix
 
+```sh
+tmhao-cli hotfix <yourApp> <yourHotfixBranchName> [-b, --branchCreation]
+
+Example:
+
+tmhao-cli hotfix go1-player link-issue -b
 ```
-tmhao-cli hotfix <yourApp> <yourHotfixBranchName> [--manualBranchCreation]
-tmhao-cli playJob <yourApp> <yourBranch> <yourJobName> [--viewJobOnly]
+
+### Job
+
+```sh
+tmhao-cli job <yourApp> <yourBranch> <yourJobName> [-p, --play]
+
+Example:
+
+tmhao-cli job go1-player master deploy:qa:k8s -p
+```
+
+### Generate a local link for the player
+
+```sh
+tmhao-cli player-local-link <yourProdLink> <yourContentPath>
+
+Example: 
+
+tmhao-cli player-local-link https://dev.mygo1.com/p/#/token?token=a0bbcb26-23fe-4248-8017-14d6db891df7&portal_name=ft5.mygo1.com /540221/
 ```

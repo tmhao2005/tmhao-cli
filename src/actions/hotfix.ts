@@ -6,7 +6,7 @@ import { log, success, warn } from "../logger";
 
 export async function hotfix() {
   const [projectName, branchName, cmd] = arguments;
-  const { manualBranchCreation } = cmd;
+  const { branchCreation } = cmd;
 
   log("scanning input project...");
   const projectService = new ProjectService();
@@ -38,7 +38,7 @@ export async function hotfix() {
   const dep = deps.shift();
   success("Found ref: %s", dep.ref);
 
-  if (manualBranchCreation) {
+  if (!branchCreation) {
     success(
       `Run this to create your hotfix: "git fetch origin ${
         dep.ref

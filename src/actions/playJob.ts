@@ -7,7 +7,7 @@ import { warnWrongInput } from "../utils";
 
 export async function playJob() {
   const [projectName, branchName, jobName, cmd] = arguments;
-  const viewJobOnly = cmd.viewJobOnly;
+  const play = cmd.play;
 
   const projectService = new ProjectService();
   const projects = await projectService.searchProject({
@@ -21,7 +21,7 @@ export async function playJob() {
   const project = projects.shift();
   const branchService = new BranchService(project.id);
 
-  log("scanning input branch...");
+  log("scanning input branch: %s...", branchName);
   const branches = await branchService.search({
     search: `${branchName}`,
   });
@@ -54,7 +54,7 @@ export async function playJob() {
   let pipeline = pipelines.find((item) => item.status === "success");
 
   success("Found pipeline: %s", pipeline.id);
-  log("scanning tag %s...", pipeline.id);
+  log("scanning tag: %s...", pipeline.id);
 
   pipelines = await pipelineService.searchPipeline({
     id: project.id,
@@ -70,18 +70,12 @@ export async function playJob() {
   success("Found pipeline: %s", pipeline.id);
   const jobService = new JobService(project.id);
 
+  log("scanning job name: %s...", jobName);
   const jobs = await jobService.getPipelineJobs({
     pipelineId: pipeline.id,
   });
 
-  if (!jobs.some((item) => item.name === jobName)) {
-    warn(
-      `Your job name is wrong. ${
-        jobs.length
-          ? `We found ${jobs.map((item) => item.name).join(", ")}`
-          : "We found nothing"
-      }`
-    );
+  if (warnWrongInput(jobName, jobs, "name")) {
     return;
   }
 
@@ -95,8 +89,11 @@ export async function playJob() {
     return;
   }
 
-  if (viewJobOnly) {
-    success("Nothing is triggered. Here is the latest job: %s", job.web_url);
+  if (!play) {
+    success(
+      "Latest job link: %s. If you wish to trigger, Run with option:  `-p`",
+      job.web_url
+    );
     return;
   }
 

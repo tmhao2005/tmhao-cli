@@ -10,7 +10,7 @@ export function warnWrongInput<T, K extends keyof T>(
   }
 
   warn(
-    `${
+    `Input "${value}" was wrong. ${
       items.length
         ? `We found similar: [${items
             .map((item) => item[property])
