@@ -4,8 +4,9 @@ import { resolve } from "path";
 import { config } from "dotenv";
 import * as program from "commander";
 import { hotfix } from "./actions/hotfix";
-import { playJob } from "./actions/playJob";
+import { playJob } from "./actions/job";
 import { genPlayerLink } from "./actions/genPlayerLink";
+import { compare } from "./actions/compare";
 
 const parsed = config({
   path: resolve(__dirname, "..", ".env"),
@@ -41,5 +42,10 @@ program
   .command("player-local-link <link> <playingPath>")
   .description("Will generate a localhost link from production link")
   .action(genPlayerLink);
+
+program
+  .command("compare <projectName> <branch> <env>")
+  .description("Will a compare link for target branch and specific environment")
+  .action(compare);
 
 program.parse(process.argv);

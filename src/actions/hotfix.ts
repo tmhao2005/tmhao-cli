@@ -1,5 +1,5 @@
 import { ProjectService } from "../services/project";
-import { searchDevelopment } from "../services/development";
+import { DevelopmentService } from "../services/development";
 import { BranchService } from "../services/branch";
 import { warnWrongInput } from "../utils";
 import { log, success, warn } from "../logger";
@@ -21,9 +21,10 @@ export async function hotfix() {
   success("Found the project");
   const project = projects.pop();
   const branchService = new BranchService(project.id);
+  const developmentService = new DevelopmentService(project.id);
 
   log("scanning production env...");
-  const deps = await searchDevelopment({
+  const deps = await developmentService.searchDevelopment({
     projectId: project.id,
     environment: "production",
     status: "success",
