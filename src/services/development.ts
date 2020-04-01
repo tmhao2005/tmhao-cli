@@ -1,5 +1,5 @@
 import * as qs from "query-string";
-import { createHttp } from "./http";
+import { BaseService } from "./base";
 
 type Env = "production";
 type Status = "success";
@@ -16,14 +16,19 @@ interface SearchDevelopmentInput {
   sort?: "desc" | "asc";
 }
 
-export const searchDevelopment = async ({
-  projectId,
-  ...query
-}: SearchDevelopmentInput): Promise<Development[]> => {
-  const http = createHttp();
-  const { data } = await http.get(
-    `/projects/${projectId}/deployments?${qs.stringify(query)}`
-  );
+export class DevelopmentService extends BaseService {
+  constructor(private id: number) {
+    super();
+  }
 
-  return data;
-};
+  searchDevelopment = async ({
+    projectId,
+    ...query
+  }: SearchDevelopmentInput): Promise<Development[]> => {
+    const { data } = await this._http.get(
+      `/projects/${this.id}/deployments?${qs.stringify(query)}`
+    );
+
+    return data;
+  };
+}

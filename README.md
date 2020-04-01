@@ -51,3 +51,13 @@ tmhao-cli player-local-link https://tmhao.mygo1.com/p/#/token?token=a0bbcb26-23f
 -> http://localhost:3000/540221?token=a0bbcb26-23fe-4248-8017-14d6db891df7&portal=tmhao.mygo1.com
 
 ```
+
+
+### Compare
+```sh
+
+tmhao-cli compare apiom-ui master production
+
+-> https://code.go1.com.au/apiom/apiom-ui/-/compare/208961...209762
+
+```

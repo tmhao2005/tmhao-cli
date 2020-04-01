@@ -40,11 +40,6 @@ export async function playJob() {
     ref: branch.name,
   });
 
-  if (pipelines.length < 1) {
-    warn("No pipeline created so far");
-    return;
-  }
-
   // Make sure this pipeline has passed
   if (!pipelines.some((item) => item.status === "success")) {
     warn("No passed pipeline found. Please check again");
@@ -91,8 +86,9 @@ export async function playJob() {
 
   if (!play) {
     success(
-      "Latest job link: %s. If you wish to trigger, Run with option:  `-p`",
-      job.web_url
+      "Latest job link: %s [%s]. If you wish to trigger, Run with option:  `-p`",
+      job.web_url,
+      job.status
     );
     return;
   }
