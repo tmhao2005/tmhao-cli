@@ -93,6 +93,25 @@ export async function playJob() {
     return;
   }
 
+  // Hack deploy production
+  if (/deploy:production/.test(job.name)) {
+    const k8sJobName = "deploy:qa:k8s";
+
+    log("Scanning job: %s", k8sJobName);
+    if (warnWrongInput("deploy:qa:k8s", jobs, "name")) {
+      return;
+    }
+
+    log("Deploying job: %s", k8sJobName);
+    const k8sJob = jobs.find((item) => item.name === "deploy:qa:k8s");
+    await jobService.playJob(k8sJob.id);
+    success("Deployed successfully %s job", k8sJobName);
+
+    log("Canceling job: %s", job.id);
+    await jobService.cancelJob(job.id);
+    success("Cancel successfully job %s", job.name);
+  }
+
   const result = await jobService.playJob(job.id);
 
   success(

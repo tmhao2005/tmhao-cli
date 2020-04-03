@@ -61,3 +61,9 @@ tmhao-cli compare apiom-ui master production
 -> https://code.go1.com.au/apiom/apiom-ui/-/compare/208961...209762
 
 ```
+
+### Retry (Yet implemented)
+
+```sh
+tmhao-cli job -r go1-player master test:e2e:1player
+```

@@ -36,4 +36,12 @@ export class JobService extends BaseService {
 
     return data;
   }
+
+  async cancelJob(jobId: number) {
+    const { data } = await this._http.post(
+      `/projects/${this.id}/jobs/${jobId}/cancel`
+    );
+
+    return data;
+  }
 }

@@ -13,14 +13,14 @@ const parsed = config({
 });
 
 if (parsed.error) {
-  throw new Error("You missed to create the required `.env` file");
+  throw Error("You missed to create the required `.env` file");
 }
 
 const version = "1.0.0";
 
 program
   .version(version)
-  .command("hotfix-branch <projectName> <branchName>")
+  .command("hotfix <projectName> <branchName>")
   .description("create a hotfix for specific app")
   .option(
     "-b, --branchCreation",
