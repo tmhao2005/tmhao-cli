@@ -23,6 +23,8 @@
     "chalk": "^3.0.0",
     "commander": "^5.0.0",
     "dotenv": "^8.2.0",
+    "envfile": "^5.0.0",
+    "ngrok": "^3.2.7",
     "query-string": "^6.11.1"
   },
   "devDependencies": {

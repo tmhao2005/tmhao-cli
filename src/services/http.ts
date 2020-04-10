@@ -1,17 +1,54 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+} from "axios";
+import { log, red } from "../logger";
 
-export type HttpInstance = AxiosInstance;
+export type HttpInstance = AxiosInstance & Extras;
 
-export function createHttp(opts: AxiosRequestConfig = {}): HttpInstance {
+interface Extras {
+  setJWT(jwt: string): void;
+}
+
+export function createHttp(
+  baseURL: string,
+  headers: Record<string, string> = {},
+  opts: AxiosRequestConfig = {}
+): HttpInstance {
   const http = axios.create({
-    baseURL: `${process.env.GITLAB_API}/api/v4`,
+    baseURL,
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-cache",
-      "PRIVATE-TOKEN": process.env.GITLAB_TOKEN,
+      ...headers,
     },
     ...opts,
   }) as HttpInstance;
+
+  http.interceptors.request.use((reqConfig: AxiosRequestConfig) => {
+    log(
+      `${reqConfig.method && reqConfig.method.toUpperCase()} ${reqConfig.url}`,
+      reqConfig.params,
+      reqConfig.data
+    );
+    return reqConfig;
+  });
+
+  http.interceptors.response.use(
+    (response: AxiosResponse) => {
+      return response;
+    },
+    (error: AxiosError) => {
+      red("[LOG]: %s", error);
+      throw error;
+    }
+  );
+
+  http.setJWT = (jwt: string) => {
+    http.defaults.headers.Authorization = `Bearer ${jwt}`;
+  };
 
   return http;
 }

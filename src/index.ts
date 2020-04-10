@@ -7,6 +7,7 @@ import { hotfix } from "./actions/hotfix";
 import { playJob } from "./actions/job";
 import { genPlayerLink } from "./actions/genPlayerLink";
 import { compare } from "./actions/compare";
+import { runMsTeams } from "./actions/runMsTeams";
 
 const parsed = config({
   path: resolve(__dirname, "..", ".env"),
@@ -47,5 +48,12 @@ program
   .command("compare <projectName> <branch> <env>")
   .description("Will a compare link for target branch and specific environment")
   .action(compare);
+
+program
+  .command("run-msteams <botDir> <appDir> <manifestDir>")
+  .description(
+    "Setup ngrok + register client app with GO1 and then change enviroment file in BOT dir & manifest dir"
+  )
+  .action(runMsTeams);
 
 program.parse(process.argv);

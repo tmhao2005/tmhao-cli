@@ -18,3 +18,8 @@ export function success(..._args: any[]) {
   const [message, ...rest] = arguments;
   console.log(chalk.greenBright(addBL(message)), ...rest);
 }
+
+export function red(..._args: any[]) {
+  const [message, ...rest] = arguments;
+  console.log(chalk.red(addBL(message)), ...rest);
+}
