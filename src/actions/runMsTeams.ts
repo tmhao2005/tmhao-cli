@@ -5,6 +5,9 @@ import * as path from "path";
 import * as fs from "fs";
 import { success, warn, log } from "../logger";
 import { GO1ClientService } from "../services/go1-client";
+import { GO1StaffService } from "../services/go1-staff";
+
+const BOT_NAME = "HAO_LOCAL_BOT";
 
 export async function runMsTeams(): Promise<void> {
   const [botDir, appDir, manifestDir] = arguments;
@@ -32,6 +35,7 @@ export async function runMsTeams(): Promise<void> {
 
   // Register app client with specific ngrok url
   const clientService = new GO1ClientService();
+  const go1StaffService = new GO1StaffService();
 
   log("Creating GO1 app...");
   const appName = `App-${Math.floor(Math.random() * 9999)}`;
@@ -39,6 +43,12 @@ export async function runMsTeams(): Promise<void> {
     name: appName,
     baseUri: botPublicUrl,
   });
+
+  const staff = await go1StaffService.getStaffByUUID(
+    process.env.GO1_STAFF_UUID
+  );
+  await clientService.grantAccessProxyApi(staff.jwt, appInfo);
+
   success("App created with ID: %s", appInfo.client_id);
 
   // Modify ".env" in BOT dir
@@ -46,7 +56,15 @@ export async function runMsTeams(): Promise<void> {
   updateEnvFile(botPath, {
     GO1_CLIENT: appInfo.client_id,
     GO1_CLIENT_SECRET: appInfo.client_secret,
-    GO1_APP_NAME: appInfo.client_name,
+    GO1_APP_NAME: BOT_NAME,
+    EDUBOT_HOST: new URL(botPublicUrl).hostname,
+  });
+  success("Successfully to change BOT env file");
+
+  // Modify ".env" in App dir
+  log(`Try to modify ".env" in ${appPath}...`);
+  updateEnvFile(appPath, {
+    AZURE_REDIRECT_URI: `${appPublicUrl}/edu/app/my-learning`,
     EDUBOT_HOST: new URL(botPublicUrl).hostname,
   });
   success("Successfully to change BOT env file");
@@ -55,6 +73,8 @@ export async function runMsTeams(): Promise<void> {
   updateEnvFile(
     manifestPath,
     {
+      BASE_URI_DOMAIN: "*.ngrok.io",
+      APP_NAME: BOT_NAME,
       LEARNING_TAB_URL: `${appPublicUrl}/edu/app/my-learning`,
       LEARNING_TAB_CONFIG_URL: `${appPublicUrl}/edu/app/config`,
     },
@@ -84,8 +104,11 @@ export async function runMsTeams(): Promise<void> {
   });
   logProcess(lsApp);
 
-  const azureLink = 'https://portal.azure.com/#@9a96b5a7-f146-4358-99cf-7bf5dc78cec3/resource/subscriptions/71edaf39-28d0-4215-b381-f0efbff46637/resourceGroups/Agents/providers/Microsoft.BotService/botServices/Hao_Bot/settings';
-  success(`Finally, Please visit the link, change "Messaging endpoint" to: "${botPublicUrl}/edu/api/messages": ${azureLink}`);
+  const azureLink =
+    "https://portal.azure.com/#@9a96b5a7-f146-4358-99cf-7bf5dc78cec3/resource/subscriptions/71edaf39-28d0-4215-b381-f0efbff46637/resourceGroups/Agents/providers/Microsoft.BotService/botServices/Hao_Bot/settings";
+  success(
+    `Finally, Please visit the link: ${azureLink}, change "Messaging endpoint" to: "${botPublicUrl}/edu/api/messages"`
+  );
 }
 
 function isExisted(dir: string) {

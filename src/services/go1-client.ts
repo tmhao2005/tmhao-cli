@@ -37,6 +37,18 @@ export class GO1ClientService {
     return data;
   }
 
+  async grantAccessProxyApi(staffToken: string, info: AppInfo) {
+    this._http.setJWT(staffToken);
+
+    const { data } = await this._http.put(`/staff/client/${info.client_id}`, {
+      client_name: info.client_name,
+      redirect_uri: info.redirect_uri,
+      proxy_api: true,
+    });
+
+    return data;
+  }
+
   async createBotApp(payload: BotAppPayload) {
     const token = await this.getToken();
     this._http.setJWT(token.access_token);
