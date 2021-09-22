@@ -1,13 +1,17 @@
 import { Project, ProjectService } from "../services/project";
 import { BranchService } from "../services/branch";
-import { PipelineService, PIPELINE_ORDER, PIPELINE_STATUS } from "../services/pipeline";
+import {
+  PipelineService,
+  PIPELINE_ORDER,
+  PIPELINE_STATUS,
+} from "../services/pipeline";
 import { log, warn, success } from "../logger";
 import { warnWrongInput } from "../utils";
 import { DevelopmentService } from "../services/development";
 
 const KNOWN_REPOS = {
-  'go1-player': 1760,
-}
+  "go1-player": 1760,
+};
 
 export async function compare() {
   const [projectName, from, environment] = arguments;
@@ -53,7 +57,7 @@ export async function compare() {
   let pipelines = await pipelineService.searchPipeline({
     id: project.id,
     ref: branch.name,
-    sort: 'desc',
+    sort: "desc",
     order_by: PIPELINE_ORDER.updated_at,
     page: 1,
     per_page: 20,
@@ -70,7 +74,7 @@ export async function compare() {
     warn("No passed pipeline found. Please check again");
     return;
   }
-  let pipeline = pipelines[0];
+  const pipeline = pipelines[0];
   success("Found pipeline: %s", pipeline.id);
 
   log("scanning tag: %s...", pipeline.id);

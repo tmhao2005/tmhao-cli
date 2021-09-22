@@ -16,7 +16,7 @@ export async function runMsTeams() {
   const botPath = path.resolve(botDir);
   const appPath = path.resolve(appDir);
   const manifestPath = path.resolve(manifestDir);
-  
+
   if (!isExisted(botPath) || !isExisted(appPath) || !isExisted(manifestPath)) {
     return;
   }
@@ -78,7 +78,7 @@ export async function runMsTeams() {
     ".env.local"
   );
 
-  log('zip bot file...');
+  log("zip bot file...");
   logProcess(
     spawn("yarn build", {
       shell: true,
@@ -91,17 +91,15 @@ export async function runMsTeams() {
   // Run docker???
 
   if (isRunAsTab) {
-    
     runAsTab(`cd ${botPath} && yarn dev`);
     runAsTab(`cd ${appPath} && yarn dev`);
-    
   } else {
     const lsBot = spawn("yarn dev", {
       shell: true,
       cwd: botPath,
     });
     logProcess(lsBot);
-  
+
     const lsApp = spawn("yarn dev", {
       shell: true,
       cwd: appPath,
@@ -122,14 +120,14 @@ function runAsTab(cmd: string) {
       do script "${cmd}"
     end tell'
   `;
-  
-  const child = exec(open, function(error, stdout, stderr) {
+
+  const child = exec(open, (error, stdout, stderr) => {
     if (error) {
-      red('Unable to open as new tab');
+      red("Unable to open as new tab");
     }
   });
 
-  child.on('exit', () => log(`${child.pid} has been killed`));
+  child.on("exit", () => log(`${child.pid} has been killed`));
 }
 
 function isExisted(dir: string) {

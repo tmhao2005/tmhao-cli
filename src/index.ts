@@ -35,12 +35,10 @@ program
 program
   .version(version)
   .command("portal [urls]")
-  .description("Help you to get the portal Id from list of portals or even from a file")
-  .option(
-    "--file <filePath>",
-    "Load portals from a specific path file",
-    false
+  .description(
+    "Help you to get the portal Id from list of portals or even from a file"
   )
+  .option("--file <filePath>", "Load portals from a specific path file", false)
   .action(portal);
 
 program

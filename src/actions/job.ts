@@ -1,6 +1,10 @@
 import { ProjectService } from "../services/project";
 import { BranchService } from "../services/branch";
-import { PipelineService, PIPELINE_ORDER, PIPELINE_STATUS } from "../services/pipeline";
+import {
+  PipelineService,
+  PIPELINE_ORDER,
+  PIPELINE_STATUS,
+} from "../services/pipeline";
 import { JobService } from "../services/job";
 import { log, warn, success } from "../logger";
 import { warnWrongInput } from "../utils";

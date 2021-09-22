@@ -3,8 +3,8 @@ import { BaseService } from "./base";
 
 interface SearchProjectInput {
   search: string;
-  page?: number
-  per_page?: number
+  page?: number;
+  per_page?: number;
 }
 
 export interface Project {
