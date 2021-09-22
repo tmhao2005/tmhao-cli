@@ -21,8 +21,8 @@ interface BotAppPayload {
 export class GO1ClientService {
   private _http: HttpInstance;
 
-  constructor() {
-    this._http = createHttp(process.env.GO1_APP_ENDPOINT);
+  constructor(baseUrl: string = process.env.GO1_APP_ENDPOINT) {
+    this._http = createHttp(baseUrl);
   }
 
   async getToken() {

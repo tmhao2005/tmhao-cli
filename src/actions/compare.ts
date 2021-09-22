@@ -1,23 +1,39 @@
-import { ProjectService } from "../services/project";
+import { Project, ProjectService } from "../services/project";
 import { BranchService } from "../services/branch";
-import { PipelineService } from "../services/pipeline";
+import { PipelineService, PIPELINE_ORDER, PIPELINE_STATUS } from "../services/pipeline";
 import { log, warn, success } from "../logger";
 import { warnWrongInput } from "../utils";
 import { DevelopmentService } from "../services/development";
 
+const KNOWN_REPOS = {
+  'go1-player': 1760,
+}
+
 export async function compare() {
   const [projectName, from, environment] = arguments;
 
-  const projectService = new ProjectService();
-  const projects = await projectService.searchProject({
-    search: projectName,
-  });
+  // search in the predefined list first
+  let project: Project | undefined;
 
-  if (warnWrongInput(projectName, projects, "name")) {
-    return;
+  const projectID = KNOWN_REPOS[projectName];
+  const projectService = new ProjectService();
+
+  if (!projectID) {
+    const projects = await projectService.searchProject({
+      page: 1,
+      per_page: 20,
+      search: projectName,
+    });
+
+    if (warnWrongInput(projectName, projects, "name")) {
+      return;
+    }
+    project = projects.shift();
+  } else {
+    log("fetching project: %s...", projectID);
+    project = await projectService.getProject(projectID);
   }
 
-  const project = projects.shift();
   const branchService = new BranchService(project.id);
 
   log("scanning branch: %s...", from);
@@ -37,14 +53,24 @@ export async function compare() {
   let pipelines = await pipelineService.searchPipeline({
     id: project.id,
     ref: branch.name,
+    sort: 'desc',
+    order_by: PIPELINE_ORDER.updated_at,
+    page: 1,
+    per_page: 20,
+    // status: [PIPELINE_STATUS.success],
   });
 
-  if (!pipelines.some((item) => item.status === "success")) {
+  // if (!pipelines.some((item) => item.status === "success")) {
+  //   warn("No passed pipeline found. Please check again");
+  //   return;
+  // }
+  // const pipeline = pipelines.find((item) => item.status === "success");
+
+  if (pipelines?.length < 1) {
     warn("No passed pipeline found. Please check again");
     return;
   }
-
-  const pipeline = pipelines.find((item) => item.status === "success");
+  let pipeline = pipelines[0];
   success("Found pipeline: %s", pipeline.id);
 
   log("scanning tag: %s...", pipeline.id);

@@ -1,26 +1,26 @@
 import * as ngrok from "ngrok";
 import * as envfile from "envfile";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { spawn, ChildProcessWithoutNullStreams, exec } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
-import { success, warn, log } from "../logger";
+import { success, warn, log, red } from "../logger";
 import { GO1ClientService } from "../services/go1-client";
 import { GO1StaffService } from "../services/go1-staff";
 
 const BOT_NAME = "HAO_LOCAL_BOT";
 
-export async function runMsTeams(): Promise<void> {
-  const [botDir, appDir, manifestDir] = arguments;
+export async function runMsTeams() {
+  const [botDir, appDir, manifestDir, cmdObject] = arguments;
+  const isRunAsTab = cmdObject.runAsTab;
 
   const botPath = path.resolve(botDir);
   const appPath = path.resolve(appDir);
   const manifestPath = path.resolve(manifestDir);
-
+  
   if (!isExisted(botPath) || !isExisted(appPath) || !isExisted(manifestPath)) {
     return;
   }
 
-  // Run ngrok
   const botPublicUrl = await ngrok.connect({
     addr: 4000,
     authtoken: process.env.NGROK_TOKEN,
@@ -33,7 +33,6 @@ export async function runMsTeams(): Promise<void> {
   });
   success("generated app url: %s", appPublicUrl);
 
-  // Register app client with specific ngrok url
   const clientService = new GO1ClientService();
   const go1StaffService = new GO1StaffService();
 
@@ -51,7 +50,6 @@ export async function runMsTeams(): Promise<void> {
 
   success("App created with ID: %s", appInfo.client_id);
 
-  // Modify ".env" in BOT dir
   log(`Try to modify ".env" in ${botPath}...`);
   updateEnvFile(botPath, {
     GO1_CLIENT: appInfo.client_id,
@@ -61,7 +59,6 @@ export async function runMsTeams(): Promise<void> {
   });
   success("Successfully to change BOT env file");
 
-  // Modify ".env" in App dir
   log(`Try to modify ".env" in ${appPath}...`);
   updateEnvFile(appPath, {
     AZURE_REDIRECT_URI: `${appPublicUrl}/edu/app/my-learning`,
@@ -69,7 +66,7 @@ export async function runMsTeams(): Promise<void> {
   });
   success("Successfully to change BOT env file");
 
-  // Modify in Manifest & run to create manifest
+  log(`Try to modify ".env.local" in ${manifestPath}...`);
   updateEnvFile(
     manifestPath,
     {
@@ -81,7 +78,7 @@ export async function runMsTeams(): Promise<void> {
     ".env.local"
   );
 
-  // Run build zip file
+  log('zip bot file...');
   logProcess(
     spawn("yarn build", {
       shell: true,
@@ -92,23 +89,47 @@ export async function runMsTeams(): Promise<void> {
   // Wont work with this way
   // exec(`yarn --cwd ${botDir} install`, (error, stdout, stderr) => {});
   // Run docker???
-  const lsBot = spawn("yarn dev", {
-    shell: true,
-    cwd: botPath,
-  });
-  logProcess(lsBot);
 
-  const lsApp = spawn("yarn dev", {
-    shell: true,
-    cwd: appPath,
-  });
-  logProcess(lsApp);
+  if (isRunAsTab) {
+    
+    runAsTab(`cd ${botPath} && yarn dev`);
+    runAsTab(`cd ${appPath} && yarn dev`);
+    
+  } else {
+    const lsBot = spawn("yarn dev", {
+      shell: true,
+      cwd: botPath,
+    });
+    logProcess(lsBot);
+  
+    const lsApp = spawn("yarn dev", {
+      shell: true,
+      cwd: appPath,
+    });
+    logProcess(lsApp);
+  }
 
   const azureLink =
     "https://portal.azure.com/#@9a96b5a7-f146-4358-99cf-7bf5dc78cec3/resource/subscriptions/71edaf39-28d0-4215-b381-f0efbff46637/resourceGroups/Agents/providers/Microsoft.BotService/botServices/Hao_Bot/settings";
   success(
     `Finally, Please visit the link: ${azureLink}, change "Messaging endpoint" to: "${botPublicUrl}/edu/api/messages"`
   );
+}
+
+function runAsTab(cmd: string) {
+  const open = `
+    osascript -e 'tell app "Terminal"
+      do script "${cmd}"
+    end tell'
+  `;
+  
+  const child = exec(open, function(error, stdout, stderr) {
+    if (error) {
+      red('Unable to open as new tab');
+    }
+  });
+
+  child.on('exit', () => log(`${child.pid} has been killed`));
 }
 
 function isExisted(dir: string) {

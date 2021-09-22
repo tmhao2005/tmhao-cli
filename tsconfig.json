@@ -5,7 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "sourceMap": false
+    "sourceMap": true
   },
   "include": [
     "typings/globals.d.ts",

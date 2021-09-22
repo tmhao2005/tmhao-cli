@@ -4,10 +4,12 @@ import { resolve } from "path";
 import { config } from "dotenv";
 import * as program from "commander";
 import { hotfix } from "./actions/hotfix";
+import portal from "./actions/portal";
 import { playJob } from "./actions/job";
 import { genPlayerLink } from "./actions/genPlayerLink";
 import { compare } from "./actions/compare";
 import { runMsTeams } from "./actions/runMsTeams";
+import masquerade from "./actions/masquerade";
 
 const parsed = config({
   path: resolve(__dirname, "..", ".env"),
@@ -29,6 +31,23 @@ program
     false
   )
   .action(hotfix);
+
+program
+  .version(version)
+  .command("portal [urls]")
+  .description("Help you to get the portal Id from list of portals or even from a file")
+  .option(
+    "--file <filePath>",
+    "Load portals from a specific path file",
+    false
+  )
+  .action(portal);
+
+program
+  .version(version)
+  .command("masq <portal>")
+  .description("...")
+  .action(masquerade);
 
 program
   .version(version)
@@ -54,6 +73,7 @@ program
   .description(
     "Setup ngrok + register client app with GO1 and then change enviroment file in BOT dir & manifest dir"
   )
+  .option("-t, --runAsTab", "Will trigger server (bot/app) as new tab", true)
   .action(runMsTeams);
 
 program.parse(process.argv);

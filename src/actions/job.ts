@@ -1,6 +1,6 @@
 import { ProjectService } from "../services/project";
 import { BranchService } from "../services/branch";
-import { PipelineService } from "../services/pipeline";
+import { PipelineService, PIPELINE_ORDER, PIPELINE_STATUS } from "../services/pipeline";
 import { JobService } from "../services/job";
 import { log, warn, success } from "../logger";
 import { warnWrongInput } from "../utils";
@@ -38,15 +38,22 @@ export async function playJob() {
   let pipelines = await pipelineService.searchPipeline({
     id: project.id,
     ref: branch.name,
+    // status: PIPELINE_STATUS.success,
   });
 
   // Make sure this pipeline has passed
-  if (!pipelines.some((item) => item.status === "success")) {
+  // if (!pipelines.some((item) => item.status === "success")) {
+  //   warn("No passed pipeline found. Please check again");
+  //   return;
+  // }
+  // let pipeline = pipelines.find((item) => item.status === "success");
+
+  // Get the test one
+  if (pipelines?.length < 1) {
     warn("No passed pipeline found. Please check again");
     return;
   }
-
-  let pipeline = pipelines.find((item) => item.status === "success");
+  let pipeline = pipelines[0];
 
   success("Found pipeline: %s", pipeline.id);
   log("scanning tag: %s...", pipeline.id);
