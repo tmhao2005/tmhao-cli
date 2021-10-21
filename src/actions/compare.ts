@@ -11,6 +11,7 @@ import { DevelopmentService } from "../services/development";
 
 const KNOWN_REPOS = {
   "go1-player": 1760,
+  "learn": 2212,
 };
 
 export async function compare() {
