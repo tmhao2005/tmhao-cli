@@ -1,4 +1,4 @@
-import * as qs from "query-string";
+import qs from "query-string";
 import { BaseService } from "./base";
 
 type Env = "production";

@@ -1,4 +1,4 @@
-import * as qs from "query-string";
+import qs from "query-string";
 import { warn, success } from "../logger";
 
 export async function genPlayerLink() {

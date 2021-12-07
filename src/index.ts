@@ -2,14 +2,14 @@
 
 import { resolve } from "path";
 import { config } from "dotenv";
-import * as program from "commander";
+import program from "commander";
 import { hotfix } from "./actions/hotfix";
 import portal from "./actions/portal";
 import { playJob } from "./actions/job";
 import { genPlayerLink } from "./actions/genPlayerLink";
 import { compare } from "./actions/compare";
 import { runMsTeams } from "./actions/runMsTeams";
-import masquerade from "./actions/masquerade";
+import { masquerade } from "./actions/masquerade";
 
 const parsed = config({
   path: resolve(__dirname, "..", ".env"),
@@ -43,8 +43,14 @@ program
 
 program
   .version(version)
-  .command("masq <portal>")
-  .description("...")
+  .command("masq")
+  .arguments("<emailOrID> <portalUrl>")
+  .option(
+    "-e, --env <value>",
+    "which env do you want to run against? Default to prod",
+    "prod"
+  )
+  .description("Masquerade a given email or ID to a given portal")
   .action(masquerade);
 
 program
@@ -63,7 +69,7 @@ program
 
 program
   .command("compare <projectName> <branch> <env>")
-  .description("Will a compare link for target branch and specific environment")
+  .description("compare link for target branch and specific environment")
   .action(compare);
 
 program

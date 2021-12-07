@@ -11,11 +11,11 @@ import { DevelopmentService } from "../services/development";
 
 const KNOWN_REPOS = {
   "go1-player": 1760,
-  "learn": 2212,
+  learn: 2212,
 };
 
-export async function compare() {
-  const [projectName, from, environment] = arguments;
+export async function compare(...args: any[]): Promise<void> {
+  const [projectName, from, environment] = args;
 
   // search in the predefined list first
   let project: Project | undefined;

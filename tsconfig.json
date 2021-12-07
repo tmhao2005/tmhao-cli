@@ -4,15 +4,10 @@
     "target": "ES2015",
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": [
-    "typings/globals.d.ts",
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "build"
-  ]
+  "include": ["typings", "src/**/*.ts"],
+  "exclude": ["node_modules", "build"]
 }

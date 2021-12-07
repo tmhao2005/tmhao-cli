@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as fs from "fs";
-import * as readline from "readline";
+import path from "path";
+import fs from "fs";
+import readline from "readline";
 import { log, warn, success } from "../logger";
 import { createHttp } from "../services/http";
 
@@ -22,12 +22,11 @@ async function portal() {
         portalUrls.push(line.trim().replace(/^https?:\/\//, ""));
       }
       search(portalUrls);
-
     } else {
       warn("File %s no found", options.file);
     }
   } else {
-    search(urls.split(','));
+    search(urls.split(","));
   }
 }
 
@@ -36,9 +35,7 @@ async function search(urls: string[]) {
   const portalUrls = urls.filter((elem) => elem && !elem.startsWith("#"));
 
   log(
-    `the final list:\n\n${portalUrls
-      .map((elem) => `"${elem}"`)
-      .join(",\n")}`
+    `the final list:\n\n${portalUrls.map((elem) => `"${elem}"`).join(",\n")}`
   );
 
   const http = createHttp(process.env.GO1_API);

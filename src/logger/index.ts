@@ -1,4 +1,4 @@
-import * as chalk from "chalk";
+import chalk from "chalk";
 
 function addBL(message: string) {
   return `${message}\n`;

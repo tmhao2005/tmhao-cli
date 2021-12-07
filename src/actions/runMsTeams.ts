@@ -1,8 +1,8 @@
-import * as ngrok from "ngrok";
-import * as envfile from "envfile";
+import ngrok from "ngrok";
+import envfile from "envfile";
 import { spawn, ChildProcessWithoutNullStreams, exec } from "child_process";
-import * as path from "path";
-import * as fs from "fs";
+import path from "path";
+import fs from "fs";
 import { success, warn, log, red } from "../logger";
 import { GO1ClientService } from "../services/go1-client";
 import { GO1StaffService } from "../services/go1-staff";
